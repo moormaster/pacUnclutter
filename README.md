@@ -33,8 +33,9 @@ Example - remove everything unneeded without asking:
 ## Dependencies
 
 ```
-sudo pacman -S --needed dialog
+sudo pacman -S --needed dialog ncurses
 ``` 
 
 - [dialog](https://archlinux.org/packages/core/x86_64/dialog/)
+- [ncurses](https://archlinux.org/packages/core/x86_64/ncurses/)
 - ([pacman](https://archlinux.org/packages/core/x86_64/pacman/))
