@@ -1,6 +1,7 @@
 #!/bin/bash
 # vi: et ts=2 sw=2
 
+ARGUMENT_ORDER="name"
 declare -A ARGUMENT_SELECTION
 ARGUMENT_SELECT_ALL=0
 ARGUMENT_UNINSTALL=0
@@ -15,9 +16,13 @@ usage() {
   echo -e "\t\tPre select packages"
   echo -e "\t-a | --select-all"
   echo -e "\t\tSelect all (uneeded) packages"
+  echo -e "\t-o <order-by>| --order <order-by>"
+  echo -e "\t\tOrder by either \"name\" or \"size\""
   echo -e "\t-u | --uninstall"
   echo -e "\t\tUninstall packages without showing a dialog"
   echo -e ""
+  echo -e "Example - ask which packages to remove ordered by size:"
+  echo -e "\t$0 -o size"
   echo -e "Example - ask which packages to remove and pre-select all:"
   echo -e "\t$0 -a"
   echo -e "Example - ask which packages to remove and pre-select specific ones:"
@@ -47,6 +52,11 @@ parse_arguments() {
       "-a" | "--select-all")
         ARGUMENT_SELECT_ALL=1
         shift 1
+        ;;
+
+      "-o" | "--order")
+        ARGUMENT_ORDER=$2
+        shift 2
         ;;
   
       "-u" | "--uninstall")
@@ -78,27 +88,56 @@ find_superfluous_packages() {
 create_dialog_items_array() {
   declare -n arr=$1
   shift 1
-  local items=("$@")
 
-  for item in "${items[@]}"
-  do
-    local selected=${ARGUMENT_SELECTION[$item]}
-    if [ "$selected" == "" ]
-    then
-      if [ ${ARGUMENT_SELECT_ALL} -eq 1 ]
+  local sortlocale=${LANG}
+  local sortoptions;
+  case "$1" in
+    "name")
+      # sort below list of lines by field 2 (=name)
+      sortoptions=("-k" "2")
+      ;;
+
+    "size")
+      # sort below list of lines by field 3 (=size)
+      sortlocale="C"
+      sortoptions=("-k" "3rh,3")
+      ;;
+
+    *)
+      error "create_dialog_items_array() called with invalid sort key: $1"
+      exit 1
+  esac
+  shift 1
+
+  # convert list of packages into sorted list of dialog items
+  local packages=("$@")
+  local itemlines=$(
+    for item in "${packages[@]}"
+    do
+      local selected=${ARGUMENT_SELECTION[$item]}
+      if [ "$selected" == "" ]
       then
-        selected=on
-      else
-        selected=off
+        if [ ${ARGUMENT_SELECT_ALL} -eq 1 ]
+        then
+          selected=on
+        else
+          selected=off
+        fi
       fi
-    fi
 
-    local size=$( LANG=C pacman -Qii $item | grep "Installed Size" | grep -P -o '\d.*' )
+      local size=$( LANG=C pacman -Qii $item | grep "Installed Size" | grep -P -o '\d.*' | sed -e 's/ //' )
 
+      echo $selected $item $size
+    done | LC_ALL=${sortlocale} sort "${sortoptions[@]}"
+  )
+
+  # convert each line into a triple (tag, item, selected) of arguments for dialog utility
+  while read selected item size
+  do  
     arr+=($item)
     arr+=("$item ($size)")
     arr+=($selected)
-  done
+  done <<< $itemlines
 }
 
 create_selected_packages_array() {
@@ -144,7 +183,7 @@ main() {
     sudo pacman -R "${packages_to_remove[@]}" --noconfirm "${ARGUMENTS_PACMAN[@]}"
   else
     declare -a dialog_items
-    create_dialog_items_array dialog_items $( find_superfluous_packages )
+    create_dialog_items_array dialog_items ${ARGUMENT_ORDER} $( find_superfluous_packages )
 
     if [ ${#dialog_items} -eq 0 ]
     then

@@ -15,9 +15,13 @@ Options:
 		Pre select packages
 	-a | --select-all
 		Select all (uneeded) packages
+	-o <order-by>| --order <order-by>
+		Order by either "name" or "size"
 	-u | --uninstall
 		Uninstall packages without showing a dialog
 
+Example - ask which packages to remove ordered by size:
+	./pacUnclutter.sh -o size
 Example - ask which packages to remove and pre-select all:
 	./pacUnclutter.sh -a
 Example - ask which packages to remove and pre-select specific ones:
