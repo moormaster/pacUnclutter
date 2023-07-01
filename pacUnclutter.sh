@@ -156,6 +156,33 @@ create_selected_packages_array() {
   done
 }
 
+unattended_uninstall() {
+    declare -a packages_to_remove
+    create_selected_packages_array packages_to_remove $( find_superfluous_packages )
+
+    if [ ${#packages_to_remove} -eq 0 ]
+    then
+      echo "No unneeded packages found or nothing selected"
+      exit 0
+    fi
+
+    sudo pacman -R "${packages_to_remove[@]}" --noconfirm "${ARGUMENTS_PACMAN[@]}"
+}
+
+dialog_for_removing_packages() {
+    declare -a dialog_items
+    create_dialog_items_array dialog_items ${ARGUMENT_ORDER} $( find_superfluous_packages )
+
+    if [ ${#dialog_items} -eq 0 ]
+    then
+      echo "No unneeded packages found"
+      exit 0
+    fi
+
+    local selection
+    dialog --no-tags --checklist "Remove unneeded packages" 24 72 20 "${dialog_items[@]}" 3>&1 1>&2 2>&3
+}
+
 main() {
   if ! parse_arguments "$@"
   then
@@ -171,30 +198,10 @@ main() {
 
   if [ ${ARGUMENT_UNINSTALL} -eq 1 ]
   then
-    declare -a packages_to_remove
-    create_selected_packages_array packages_to_remove $( find_superfluous_packages )
-
-    if [ ${#packages_to_remove} -eq 0 ]
-    then
-      echo "No unneeded packages found or nothing selected"
-      exit 0
-    fi
-
-    sudo pacman -R "${packages_to_remove[@]}" --noconfirm "${ARGUMENTS_PACMAN[@]}"
+    unattended_uninstall
   else
-    declare -a dialog_items
-    create_dialog_items_array dialog_items ${ARGUMENT_ORDER} $( find_superfluous_packages )
-
-    if [ ${#dialog_items} -eq 0 ]
-    then
-      echo "No unneeded packages found"
-      exit 0
-    fi
-
     local selection
-    if selection=$( 
-      dialog --no-tags --checklist "Remove unneeded packages" 24 72 20 "${dialog_items[@]}" 3>&1 1>&2 2>&3
-    )
+    if selection=$( dialog_for_removing_packages )
     then
       if [ "${selection}" == "" ]
       then
