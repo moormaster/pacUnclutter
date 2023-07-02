@@ -183,7 +183,7 @@ dialog_for_removing_packages() {
     fi
 
     local selection
-    dialog --no-tags --checklist "Remove unneeded packages" $lines $columns $(( $lines-2 )) "${dialog_items[@]}" 3>&1 1>&2 2>&3
+    dialog --erase-on-exit --no-tags --checklist "Remove unneeded packages" $lines $columns $(( $lines-2 )) "${dialog_items[@]}" 3>&1 1>&2 2>&3
 }
 
 main() {
