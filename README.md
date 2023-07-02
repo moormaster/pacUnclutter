@@ -30,6 +30,13 @@ Example - remove everything unneeded without asking:
 	./pacUnclutter.sh -u -a
 ```
 
+## Installation
+
+```
+sudo pacman -S base-devel --needed
+makepkg -si
+```
+
 ## Dependencies
 
 ```
