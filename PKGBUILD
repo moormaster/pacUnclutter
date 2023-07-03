@@ -1,6 +1,6 @@
 # Maintainer: Your Name <youremail@domain.com>
 pkgname=pacUnclutter-git
-pkgver=r5.604f315
+pkgver=VERSION
 pkgrel=1
 pkgdesc=""
 arch=(any)

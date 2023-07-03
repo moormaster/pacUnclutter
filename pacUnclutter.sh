@@ -133,7 +133,12 @@ create_dialog_items_array() {
 
   # convert each line into a triple (tag, item, selected) of arguments for dialog utility
   while read selected item size
-  do  
+  do
+    if [ "$item" == "" ]
+    then
+      continue
+    fi
+
     arr+=($item)
     arr+=("$item ($size)")
     arr+=($selected)
@@ -173,10 +178,10 @@ dialog_for_removing_packages() {
     declare -a dialog_items
     create_dialog_items_array dialog_items ${ARGUMENT_ORDER} $( find_superfluous_packages )
 
-    if [ ${#dialog_items} -eq 0 ]
+    if [ ${#dialog_items[@]} -eq 0 ]
     then
-      echo "No unneeded packages found"
-      exit 0
+      error "No unneeded packages found"
+      exit 1
     fi
 
     local selection
@@ -211,7 +216,7 @@ main() {
 
       sudo pacman -R ${selection} "${ARGUMENTS_PACMAN[@]}"
     else
-      echo "Aborted"
+      error "Aborted"
       exit 1
     fi
   fi
