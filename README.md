@@ -40,9 +40,8 @@ makepkg -si
 ## Dependencies
 
 ```
-sudo pacman -S --needed dialog ncurses
+sudo pacman -S --asdeps --needed dialog
 ``` 
 
 - [dialog](https://archlinux.org/packages/core/x86_64/dialog/)
-- [ncurses](https://archlinux.org/packages/core/x86_64/ncurses/)
 - ([pacman](https://archlinux.org/packages/core/x86_64/pacman/))

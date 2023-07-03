@@ -170,9 +170,6 @@ unattended_uninstall() {
 }
 
 dialog_for_removing_packages() {
-    local columns=$(( $(tput cols)-14 ))
-    local lines=$(( $(tput lines)-8 ))
-
     declare -a dialog_items
     create_dialog_items_array dialog_items ${ARGUMENT_ORDER} $( find_superfluous_packages )
 
@@ -183,7 +180,7 @@ dialog_for_removing_packages() {
     fi
 
     local selection
-    dialog --erase-on-exit --no-tags --checklist "Remove unneeded packages" $lines $columns $(( $lines-2 )) "${dialog_items[@]}" 3>&1 1>&2 2>&3
+    dialog --erase-on-exit --no-tags --checklist "Remove unneeded packages" 0 0 0 "${dialog_items[@]}" 3>&1 1>&2 2>&3
 }
 
 main() {
@@ -196,12 +193,6 @@ main() {
   if ! which dialog > /dev/null
   then
     error "dialog is not installed!"
-    exit 1
-  fi
-
-  if ! which tput > /dev/null
-  then
-    error "ncurses is not installed!"
     exit 1
   fi
 
