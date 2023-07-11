@@ -110,9 +110,9 @@ create_dialog_items_array() {
   shift 1
 
   # convert list of packages into sorted list of dialog items
-  local packages=("$@")
+  local packages_and_sizes="$( LANG=C pacman -Qii "$@" | grep -Po '(Name\s+:\s+\K.+|Size\s+:\s+\K.+)' | sed -e 's/ //' )"
   local itemlines=$(
-    for item in "${packages[@]}"
+    while read item; read size
     do
       local selected=${ARGUMENT_SELECTION[$item]}
       if [ "$selected" == "" ]
@@ -125,10 +125,8 @@ create_dialog_items_array() {
         fi
       fi
 
-      local size=$( LANG=C pacman -Qii $item | grep "Installed Size" | grep -P -o '\d.*' | sed -e 's/ //' )
-
       echo $selected $item $size
-    done | LC_ALL=${sortlocale} sort "${sortoptions[@]}"
+    done <<< "${packages_and_sizes}" | LC_ALL=${sortlocale} sort "${sortoptions[@]}"
   )
 
   # convert each line into a triple (tag, item, selected) of arguments for dialog utility
