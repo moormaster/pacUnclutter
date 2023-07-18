@@ -220,4 +220,7 @@ main() {
   fi
 }
 
-main "$@"
+if [ "${BASH_ARGV0}" == "${BASH_SOURCE[0]}" ]
+then
+  main "$@"
+fi
