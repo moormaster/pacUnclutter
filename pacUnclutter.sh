@@ -150,11 +150,16 @@ create_selected_packages_array() {
 
   for item in "${items[@]}"
   do
-    if [ ${ARGUMENT_SELECT_ALL} -ne 1 ] && [ "${ARGUMENT_SELECTION[$item]}" != "on" ]
+    if [ "${ARGUMENT_SELECTION[$item]}" == "" ] && [ $ARGUMENT_SELECT_ALL -ne 1 ] 
+    then
+      continue;
+    fi
+
+    if [ "${ARGUMENT_SELECTION[$item]}" != "" ] &&  [ "${ARGUMENT_SELECTION[$item]}" != "on" ]
     then
       continue
     fi
-
+    
     arr+=($item)
   done
 }
