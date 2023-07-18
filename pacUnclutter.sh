@@ -7,6 +7,9 @@ ARGUMENT_SELECT_ALL=0
 ARGUMENT_UNINSTALL=0
 ARGUMENTS_PACMAN=()
 
+# make pacUnclutter work with MSYS2 which does not have sudo
+SUDO_COMMAND="$( which sudo 2> /dev/null )" || true
+
 usage() {
   echo -e "$0 [options] -- [additional arguments for pacman]"
   echo -e "Options:"
@@ -164,6 +167,10 @@ create_selected_packages_array() {
   done
 }
 
+check_and_warn_if_sudo_not_present() {
+    [ "${SUDO_COMMAND}" == "" ] && error WARNING: sudo not installed. Will attempt to run pacman commands without usind sudo. 
+}
+
 unattended_uninstall() {
     declare -a packages_to_remove
     create_selected_packages_array packages_to_remove $( find_superfluous_packages )
@@ -174,7 +181,8 @@ unattended_uninstall() {
       return 0
     fi
 
-    sudo pacman -R "${packages_to_remove[@]}" --noconfirm "${ARGUMENTS_PACMAN[@]}"
+    check_and_warn_if_sudo_not_present
+    ${SUDO_COMMAND} pacman -R "${packages_to_remove[@]}" --noconfirm "${ARGUMENTS_PACMAN[@]}"
 }
 
 dialog_for_removing_packages() {
@@ -217,7 +225,8 @@ main() {
         exit 0
       fi
 
-      sudo pacman -R ${selection} "${ARGUMENTS_PACMAN[@]}"
+      check_and_warn_if_sudo_not_present
+      ${SUDO_COMMAND} pacman -R ${selection} "${ARGUMENTS_PACMAN[@]}"
     else
       error "Aborted"
       exit 1
