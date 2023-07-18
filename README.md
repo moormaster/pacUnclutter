@@ -45,3 +45,12 @@ sudo pacman -S --asdeps --needed dialog
 
 - [dialog](https://archlinux.org/packages/core/x86_64/dialog/)
 - ([pacman](https://archlinux.org/packages/core/x86_64/pacman/))
+- ([shellspec](https://aur.archlinux.org/packages/shellspec))
+
+## UnitTests
+
+To run the unittests [shellspec](https://aur.archlinux.org/packages/shellspec) must be installed.
+
+```
+shellspec -f d
+```
