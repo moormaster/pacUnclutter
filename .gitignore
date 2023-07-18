@@ -1,4 +1,8 @@
-pacUnclutter/*
+/.shellspec-local
+/.shellspec-quick.log
+/coverage/
+pacUnclutter/
 pacUnclutter-git-*.tar.*
-pkg/*
-src/*
+pkg/
+/report/
+src/
