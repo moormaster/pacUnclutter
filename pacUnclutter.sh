@@ -105,7 +105,7 @@ create_dialog_items_array() {
 
     *)
       error "create_dialog_items_array() called with invalid sort key: $1"
-      exit 1
+      return 1
   esac
   shift 1
 
@@ -166,7 +166,7 @@ unattended_uninstall() {
     if [ ${#packages_to_remove} -eq 0 ]
     then
       echo "No unneeded packages found or nothing selected"
-      exit 0
+      return 0
     fi
 
     sudo pacman -R "${packages_to_remove[@]}" --noconfirm "${ARGUMENTS_PACMAN[@]}"
@@ -174,12 +174,12 @@ unattended_uninstall() {
 
 dialog_for_removing_packages() {
     declare -a dialog_items
-    create_dialog_items_array dialog_items ${ARGUMENT_ORDER} $( find_superfluous_packages )
+    create_dialog_items_array dialog_items ${ARGUMENT_ORDER} $( find_superfluous_packages ) || return 1
 
     if [ ${#dialog_items[@]} -eq 0 ]
     then
       error "No unneeded packages found"
-      exit 1
+      return 1
     fi
 
     local selection
