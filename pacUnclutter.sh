@@ -72,6 +72,7 @@ parse_arguments() {
         ;;
 
       "--")
+        shift 1
         ARGUMENTS_PACMAN=("$@")
         shift $#
         ;;
