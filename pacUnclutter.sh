@@ -3,6 +3,7 @@
 
 ARGUMENT_ORDER="name"
 declare -A ARGUMENT_SELECTION
+ARGUMENT_SEARCH_PACKAGE_TYPE="unneeded"
 ARGUMENT_SELECT_ALL=0
 ARGUMENT_UNINSTALL=0
 ARGUMENTS_PACMAN=()
@@ -21,6 +22,12 @@ usage() {
   echo -e "\t\tPre select packages"
   echo -e "\t-o <order-by>| --order <order-by>"
   echo -e "\t\tOrder by either \"name\" or \"size\""
+  echo -e "\t-t <type> | --search-package-type <type>"
+  echo -e "\t\tType of packages to search for."
+  echo -e "\t\t\t\"unneeded\" (default)"
+  echo -e "\t\t\t\tsearch for installed packages that are not needed anymore"
+  echo -e "\t\t\t\"installed\""
+  echo -e "\t\t\t\tsearch for all packages that are currently installed"
   echo -e "\t-u | --uninstall"
   echo -e "\t\tUninstall packages without showing a dialog"
   echo -e ""
@@ -62,6 +69,11 @@ parse_arguments() {
         shift 2
         ;;
   
+      "-t" | "--search-package-type")
+        ARGUMENT_SEARCH_PACKAGE_TYPE=$2
+        shift 2
+        ;;
+
       "-u" | "--uninstall")
         ARGUMENT_UNINSTALL=1
         shift 1
@@ -87,6 +99,25 @@ parse_arguments() {
 
 find_superfluous_packages() {
   pacman -Qtdq
+}
+
+find_installed_packages() {
+  pacman -Qq
+}
+
+search_for_packages() {
+  case "${ARGUMENT_SEARCH_PACKAGE_TYPE}" in
+    "installed")
+      find_installed_packages
+      ;;
+    "unneeded")
+      find_superfluous_packages
+      ;;
+    *)
+      error "Unknown package type: ${ARGUMENT_SEARCH_PACKAGE_TYPE}"
+      return 1
+      ;;
+  esac
 }
 
 create_dialog_items_array() {
@@ -174,7 +205,7 @@ check_and_warn_if_sudo_not_present() {
 
 unattended_uninstall() {
     declare -a packages_to_remove
-    create_selected_packages_array packages_to_remove $( find_superfluous_packages )
+    create_selected_packages_array packages_to_remove $( search_for_packages )
 
     if [ ${#packages_to_remove} -eq 0 ]
     then
@@ -188,7 +219,7 @@ unattended_uninstall() {
 
 dialog_for_removing_packages() {
     declare -a dialog_items
-    create_dialog_items_array dialog_items ${ARGUMENT_ORDER} $( find_superfluous_packages ) || return 1
+    create_dialog_items_array dialog_items ${ARGUMENT_ORDER} $( search_for_packages ) || return 1
 
     if [ ${#dialog_items[@]} -eq 0 ]
     then
