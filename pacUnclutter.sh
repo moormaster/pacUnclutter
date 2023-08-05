@@ -13,12 +13,12 @@ SUDO_COMMAND="$( which sudo 2> /dev/null )" || true
 usage() {
   echo -e "$0 [options] -- [additional arguments for pacman]"
   echo -e "Options:"
+  echo -e "\t-a | --select-all"
+  echo -e "\t\tSelect all packages"
   echo -e "\t-d <packagename> | --deselect <packagename>"
   echo -e "\t\tDeselect a package (when using --select-all)"
   echo -e "\t-s <packagename> | --select <packagename>"
   echo -e "\t\tPre select packages"
-  echo -e "\t-a | --select-all"
-  echo -e "\t\tSelect all (uneeded) packages"
   echo -e "\t-o <order-by>| --order <order-by>"
   echo -e "\t\tOrder by either \"name\" or \"size\""
   echo -e "\t-u | --uninstall"
@@ -42,6 +42,11 @@ parse_arguments() {
   while [ $# -gt 0 ]
   do
     case "$1" in
+      "-a" | "--select-all")
+        ARGUMENT_SELECT_ALL=1
+        shift 1
+        ;;
+
       "-d" | "--deselect")
         ARGUMENT_SELECTION+=("$2" off)
         shift 2
@@ -52,11 +57,6 @@ parse_arguments() {
         shift 2
          ;;
   
-      "-a" | "--select-all")
-        ARGUMENT_SELECT_ALL=1
-        shift 1
-        ;;
-
       "-o" | "--order")
         ARGUMENT_ORDER=$2
         shift 2
