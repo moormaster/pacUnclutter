@@ -55,21 +55,45 @@ parse_arguments() {
         ;;
 
       "-d" | "--deselect")
+        if [ "$2" == "" ]
+        then
+          error "Parameter $1 expects a <packagename> argument"
+          return 1
+        fi
         ARGUMENT_SELECTION+=("$2" off)
         shift 2
         ;;
   
       "-s" | "--select")
+        if [ "$2" == "" ]
+        then
+          error "Parameter $1 expects a <packagename> argument"
+          return 1
+        fi
         ARGUMENT_SELECTION+=("$2" on)
         shift 2
          ;;
   
       "-o" | "--order")
+        if [ "$2" == "" ] ||
+          ( [ "$2" != "name" ] &&
+            [ "$2" != "size" ] )
+        then
+          error "Parameter $1 expects an <order-by> argument, either \"name\" or \"size\""
+          return 1
+        fi
         ARGUMENT_ORDER=$2
         shift 2
         ;;
   
       "-t" | "--search-package-type")
+        if [ "$2" == "" ] ||
+          ( [ "$2" != "installed" ] &&
+            [ "$2" != "unneeded" ] )
+        then
+          error "Parameter $1 expects a <type> argument, either \"installed\" or \"unneeded\""
+          return 1
+        fi
         ARGUMENT_SEARCH_PACKAGE_TYPE=$2
         shift 2
         ;;
