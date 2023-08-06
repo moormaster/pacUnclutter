@@ -26,13 +26,15 @@ Options:
 	-u | --uninstall
 		Uninstall packages without showing a dialog
 
-Example - ask which packages to remove ordered by size:
+Example - show superfluous packages ordered by size:
 	./pacUnclutter.sh -o size
-Example - ask which packages to remove and pre-select all:
+Example - show installed packages ordered by size:
+	./pacUnclutter.sh -t installed -o size
+Example - show superfluous packages and preselect all in the dialog:
 	./pacUnclutter.sh -a
-Example - ask which packages to remove and pre-select specific ones:
+Example - show superfluous packages and pre-select specific ones:
 	./pacUnclutter.sh -a -s cmake -s gdb
-Example - remove everything unneeded without asking:
+Example - remove all superfluous packages without asking:
 	./pacUnclutter.sh -u -a
 ```
 
