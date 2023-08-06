@@ -9,14 +9,20 @@ An interactive console helper to remove unneeded packages in ArchLinux.
 $ ./pacUnclutter.sh --help
 ./pacUnclutter.sh [options] -- [additional arguments for pacman]
 Options:
+	-a | --select-all
+		Select all packages
 	-d <packagename> | --deselect <packagename>
 		Deselect a package (when using --select-all)
 	-s <packagename> | --select <packagename>
 		Pre select packages
-	-a | --select-all
-		Select all (uneeded) packages
 	-o <order-by>| --order <order-by>
 		Order by either "name" or "size"
+	-t <type> | --search-package-type <type>
+		Type of packages to search for.
+			"unneeded" (default)
+				search for installed packages that are not needed anymore
+			"installed"
+				search for all packages that are currently installed
 	-u | --uninstall
 		Uninstall packages without showing a dialog
 
