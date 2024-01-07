@@ -2,7 +2,7 @@
 /.shellspec-quick.log
 /coverage/
 pacUnclutter/
-pacUnclutter-git-*.tar.*
+pacunclutter-git-*.tar.*
 pkg/
 /report/
 src/
